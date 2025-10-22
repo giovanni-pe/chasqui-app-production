@@ -1,0 +1,53 @@
+name: Deploy Vue to EC2
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Clonar código
+      - uses: actions/checkout@v4
+
+      # 2. Build
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Build
+        run: |
+          npm ci
+          npm run build                     # genera dist/
+
+      # 3. Limpiar carpeta destino con sudo
+      - name: Clean dist dir
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ec2-3-129-67-242.us-east-2.compute.amazonaws.com
+          username: ec2-user
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            sudo rm -rf /home/ec2-user/ChasquiX/frontend/dist/*
+            sudo chown -R ec2-user:ec2-user /home/ec2-user/ChasquiX/frontend/dist
+
+      # 4. Copiar artefactos (ya no necesita --rm, ni overwrite)
+      - name: Upload dist
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ec2-3-129-67-242.us-east-2.compute.amazonaws.com
+          username: ec2-user
+          key: ${{ secrets.EC2_KEY }}
+          source: "dist/*"
+          target: "/home/ec2-user/ChasquiX/frontend/dist"
+          strip_components: 1
+
+      # 5. Recargar Nginx
+      - name: Reload Nginx
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ec2-3-129-67-242.us-east-2.compute.amazonaws.com
+          username: ec2-user
+          key: ${{ secrets.EC2_KEY }}
+          script: sudo systemctl reload nginx

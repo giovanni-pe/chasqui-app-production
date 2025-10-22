@@ -1,0 +1,9 @@
+{
+  "name": "Chasqui Explorer",
+  "short_name": "Chasqui",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2067d7",
+  "icons": [  ]
+}
