@@ -21,21 +21,7 @@ const Register = () => import('@/auth/pages/Register.vue');
 const DashboardRedirect = () => import('@/router/components/DashboardRedirect.vue');
 
 
-const Dashboard = {
-  setup() {
-    const { goToDashboard } = useNavigation();
-    goToDashboard();
-    return {};
-  },
-  template: `
-    <div class="min-h-screen flex items-center justify-center bg-gray-50">
-      <div>
-        <div class="loader mx-auto mb-2" />
-        <div class="text-center text-gray-500">Redirigiendo a tu panel...</div>
-      </div>
-    </div>
-  `,
-};
+
 
 /* ──────────────────────  Rutas  ─────────────────────────── */
 const routes: RouteRecordRaw[] = [
@@ -61,7 +47,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/dashboard',
     component: ProtectedRoute,
-    children: [{ path: '', component: Dashboard }],
+    children: [{ path: '', component: DashboardRedirect }],
   },
   {
     path: '/passenger',
@@ -156,7 +142,7 @@ const routes: RouteRecordRaw[] = [
 
 /* ──────────────  Router instantiation  ───────────── */
 export const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
   scrollBehavior: () => ({ top: 0 }),
 });
