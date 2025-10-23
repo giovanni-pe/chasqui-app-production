@@ -1,18 +1,22 @@
 import { fileURLToPath, URL } from 'node:url'
-
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
-// https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     vue(),
-    vueDevTools(),
-  ],
+    mode === 'development' && vueDevTools(), // dev-only
+  ].filter(Boolean),
+  base: '/', // tu app vive en chasquisante.smartpx.org (raíz)
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      // Descomenta solo si usas `template:` en JS/TS:
+       'vue': 'vue/dist/vue.esm-bundler.js',
     },
   },
-})
+  build: {
+    sourcemap: false,
+  },
+}))
